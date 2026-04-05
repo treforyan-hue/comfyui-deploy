@@ -123,8 +123,7 @@ if [ "$DRY_RUN" = "0" ]; then
     fi
 
     python3 -c "import torch; assert torch.cuda.is_available()" 2>/dev/null || {
-        warn "PyTorch/CUDA not detected, installing..."
-        pip install --break-system-packages -q torch torchvision torchaudio
+        warn "PyTorch/CUDA not detected — Docker image should have it, skipping reinstall"
     }
 
     mkdir -p "$MODELS"/{diffusion_models,unet,vae,text_encoders,clip,clip_vision,loras,checkpoints}
@@ -180,8 +179,7 @@ if [ "$DRY_RUN" = "0" ]; then
         make_link "$MODELS/rife/rife49.pth" "$CNODES/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
     fi
 
-    pip install --break-system-packages -q imageio-ffmpeg 2>/dev/null || true
-    pip cache purge 2>/dev/null || true
+    # imageio-ffmpeg already in Docker image, skip pip
     rm -rf /tmp/pip* /tmp/torch* 2>/dev/null || true
 fi
 
