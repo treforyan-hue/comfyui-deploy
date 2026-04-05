@@ -18,7 +18,7 @@ install_all_nodes() {
 
     # ── Video / Animation nodes ──
     clone_node "https://github.com/kijai/ComfyUI-segment-anything-2"
-    # ViTPose is included in comfyui_controlnet_aux (DWPose/ViTPose preprocessors)
+    clone_node "https://github.com/kijai/ComfyUI-WanAnimatePreprocess"
     clone_node "https://github.com/Fannovel16/ComfyUI-Frame-Interpolation"
     clone_node "https://github.com/vrgamegirl19/comfyui-vrgamedevgirl"
 
