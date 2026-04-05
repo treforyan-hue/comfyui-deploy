@@ -128,14 +128,11 @@ RUN pip install --break-system-packages --no-cache-dir -q \
     segment_anything imageio-ffmpeg insightface onnxruntime \
     2>/dev/null || true
 
-# ── Verify all critical imports ──
+# ── Verify all critical imports (no CUDA assert — no GPU on build runner) ──
 RUN cd $COMFY && python3 -c "\
-import torch; \
-print('torch', torch.__version__); \
-assert torch.cuda.is_available(); \
-import torchaudio; \
-print('torchaudio', torchaudio.__version__); \
-print('CUDA', torch.version.cuda); \
+import torch; print('torch', torch.__version__); \
+import torchaudio; print('torchaudio', torchaudio.__version__); \
+print('CUDA build:', torch.version.cuda); \
 " && echo "=== ALL CHECKS PASSED ==="
 
 # ── Cleanup ──
