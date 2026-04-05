@@ -97,7 +97,7 @@ install_all_nodes() {
     # Extra pip packages needed by various nodes
     pip install --break-system-packages -q \
         sageattention mediapipe==0.10.14 lpips pyexiftool \
-        segment_anything imageio-ffmpeg insightface onnxruntime \
+        segment_anything imageio-ffmpeg insightface onnxruntime-gpu \
         2>/dev/null || warn "Some pip packages failed (non-critical)"
 
     log "All custom nodes installed"

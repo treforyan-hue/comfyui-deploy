@@ -122,10 +122,10 @@ RUN mkdir -p $CNODES/ComfyUI_UltimateSDUpscale/repositories \
 RUN mkdir -p $CNODES/ComfyUI-Frame-Interpolation/ckpts/rife
 
 # Extra pip packages (force reinstall torch-compatible versions)
-# NOTE: onnxruntime (CPU) is used for pose detection — GPU version has CUDA compat issues
+# onnxruntime-gpu 1.24+ supports CUDA 12.x-13.x — needed for GPU pose detection
 RUN pip install --break-system-packages --no-cache-dir -q \
     sageattention mediapipe==0.10.14 lpips pyexiftool \
-    segment_anything imageio-ffmpeg insightface onnxruntime \
+    segment_anything imageio-ffmpeg insightface onnxruntime-gpu \
     2>/dev/null || true
 
 # ── Verify all critical imports (no CUDA assert — no GPU on build runner) ──
