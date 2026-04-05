@@ -30,8 +30,8 @@ RUN NVRTC_PATH=$(find /usr/local/lib/python3.11 -name "libnvrtc-builtins.so.13*"
          ln -sf "$NVRTC_PATH" /usr/lib/x86_64-linux-gnu/libnvrtc-builtins.so.13.0; \
        fi
 
-# Verify torch + CUDA
-RUN python3 -c "import torch; print('PyTorch:', torch.__version__); assert torch.cuda.is_available(), 'CUDA not available'; import torchaudio; print('torchaudio:', torchaudio.__version__)"
+# Verify torch + torchaudio installed (CUDA check skipped — no GPU on build runner)
+RUN python3 -c "import torch; print('PyTorch:', torch.__version__); import torchaudio; print('torchaudio:', torchaudio.__version__); print('CUDA build:', torch.version.cuda)"
 
 # ── ComfyUI ──
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git $COMFY \
