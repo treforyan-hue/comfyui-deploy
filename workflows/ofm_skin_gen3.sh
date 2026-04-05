@@ -23,11 +23,11 @@ models_ofm_skin_gen3() {
     dl_pub "https://huggingface.co/camenduru/FLUX.1-dev-ungated/resolve/main/ae.safetensors" \
         "$MODELS/vae/ae.safetensors"
 
-    # SeedVR2
+    # SeedVR2 (must be in seedvr2/ directory for SeedVR2LoadDiTModel)
     dl_hf "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/ema_vae_fp16.safetensors" \
-        "$MODELS/vae/ema_vae_fp16.safetensors"
+        "$MODELS/seedvr2/ema_vae_fp16.safetensors"
     dl_hf "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/seedvr2_ema_3b_fp8_e4m3fn.safetensors" \
-        "$MODELS/checkpoints/seedvr2_ema_3b_fp8_e4m3fn.safetensors"
+        "$MODELS/seedvr2/seedvr2_ema_3b_fp8_e4m3fn.safetensors"
 
     # Upscaler
     dl_pub "https://huggingface.co/LS110824/upscale/resolve/main/4x-ClearRealityV1.pth" \
