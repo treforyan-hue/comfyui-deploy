@@ -96,6 +96,9 @@ fi
 # ══════════════════════════════════════
 section "Pre-flight checks"
 
+# Install aria2c for fast parallel downloads (if not in Docker image)
+_ensure_aria2
+
 if [ -z "${HF_TOKEN:-}" ]; then
     warn "HF_TOKEN not set. Some model downloads will fail."
 fi
