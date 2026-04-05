@@ -55,6 +55,12 @@ install_all_nodes() {
     clone_node "https://github.com/SKBv0/ComfyUI_SKBundle"
     clone_node "https://github.com/teskor-hub/comfyui-teskors-utils"
 
+    # ── KiaraPanels (custom generated nodes for kiara_sasat) ──
+    if [ -d "$SCRIPT_DIR/extras/KiaraPanels" ] && [ ! -d "$CNODES/KiaraPanels" ]; then
+        log "Installing KiaraPanels..."
+        cp -r "$SCRIPT_DIR/extras/KiaraPanels" "$CNODES/"
+    fi
+
     # ── INSTARAW (proprietary, bundled in repo) ──
     if [ -d "$SCRIPT_DIR/extras/ComfyUI_INSTARAW" ] && [ ! -d "$CNODES/ComfyUI_INSTARAW" ]; then
         log "Installing INSTARAW..."
