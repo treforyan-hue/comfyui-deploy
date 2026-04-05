@@ -21,12 +21,16 @@ models_ofm_zit_gen() {
         "$MODELS/upscale_models/RealESRGAN_x2.pth"
 
     # SAM + SeedVR2
-    dl_hf "https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam_vit_b_01ec64.pth" \
+    dl_pub "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth" \
         "$MODELS/sams/sam_vit_b_01ec64.pth"
     dl_hf "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/seedvr2_ema_7b_fp16.safetensors" \
         "$MODELS/seedvr2/seedvr2_ema_7b_fp16.safetensors"
     dl_hf "https://huggingface.co/numz/SeedVR2_comfyUI/resolve/main/ema_vae_fp16.safetensors" \
         "$MODELS/seedvr2/ema_vae_fp16.safetensors"
+
+    # Impact Pack detection (for FaceDetailer)
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8m.pt" \
+        "$MODELS/ultralytics/bbox/face_yolov8m.pt"
 
     # CivitAI LoRAs
     dl_civitai "2617751" "$MODELS/loras/Realistic_Snapshot_v5.safetensors"

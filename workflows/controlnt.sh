@@ -22,6 +22,9 @@ models_controlnt() {
     # ControlNet Union 2.1 (v1 uses this)
     dl_hf "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union-2.1/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union-2.1-2602-8steps.safetensors" \
         "$MODELS/model_patches/Z-Image-Turbo-Fun-Controlnet-Union-2.1-2602-8steps.safetensors"
+    # Symlink for JSON compatibility (workflow uses shorter name)
+    make_link "$MODELS/model_patches/Z-Image-Turbo-Fun-Controlnet-Union-2.1-2602-8steps.safetensors" \
+        "$MODELS/model_patches/Z-Image-Turbo-Fun-Controlnet-Union-2.1.safetensors"
 
     # ControlNet Union older (v2 uses this)
     dl_hf "https://huggingface.co/alibaba-pai/Z-Image-Turbo-Fun-Controlnet-Union/resolve/main/Z-Image-Turbo-Fun-Controlnet-Union.safetensors" \

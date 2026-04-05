@@ -25,9 +25,15 @@ models_icy_scail_2() {
     dl_hf "https://huggingface.co/Comfy-Org/vae-text-encorder-for-flux-klein-9b/resolve/main/split_files/text_encoders/qwen_3_8b_fp8mixed.safetensors" \
         "$MODELS/text_encoders/qwen_3_8b_fp8mixed.safetensors"
 
-    # Detection (ViTPose + DWPose)
+    # Detection (ViTPose H — needs both model + data files)
     dl_pub "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose_h_wholebody_model.onnx" \
         "$MODELS/detection/vitpose_h_wholebody_model.onnx"
+    dl_pub "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose_h_wholebody_data.bin" \
+        "$MODELS/detection/vitpose_h_wholebody_data.bin"
+    dl_hf "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx" \
+        "$MODELS/detection/yolov10m.onnx"
+    # Symlink for JSON compatibility (some workflows reference as model.onnx)
+    make_link "$MODELS/detection/yolov10m.onnx" "$MODELS/detection/model.onnx"
 
     # LightX2V LoRA
     dl_hf "https://huggingface.co/MonsterMMORPG/Wan_GGUF/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64_fixed.safetensors" \

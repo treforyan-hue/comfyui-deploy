@@ -25,11 +25,17 @@ models_ofm_nsfw() {
     dl_hf "https://huggingface.co/tianweiy/DMD2/resolve/main/dmd2_sdxl_4step_lora_fp16.safetensors" \
         "$MODELS/loras/dmd2_sdxl_4step_lora_fp16.safetensors"
 
-    # Upscalers
+    # CivitAI LoRA (filename with spaces — matches JSON exactly)
+    dl_civitai "368603" "$MODELS/loras/Detailed Nipples XL v1.0.safetensors"
+
+    # Upscalers (filenames match JSON exactly)
     dl_pub "https://huggingface.co/Kim2091/UltraSharpV2/resolve/main/4x-UltraSharpV2.pth" \
         "$MODELS/upscale_models/4x-UltraSharpV2.pth"
     dl_pub "https://huggingface.co/uwg/upscaler/resolve/main/ESRGAN/1x-ITF-SkinDiffDetail-Lite-v1.pth" \
         "$MODELS/upscale_models/1x-ITF-SkinDiffDetail-Lite-v1.pth"
+    # Symlink for JSON compatibility (workflow uses x1_ prefix)
+    make_link "$MODELS/upscale_models/1x-ITF-SkinDiffDetail-Lite-v1.pth" \
+        "$MODELS/upscale_models/x1_ITF_SkinDiffDetail_Lite_v1.pth"
     dl_pub "https://huggingface.co/gemasai/4x_NMKD-Superscale-SP_178000_G/resolve/main/4x_NMKD-Superscale-SP_178000_G.pth" \
         "$MODELS/upscale_models/4x_NMKD-Superscale-SP_178000_G.pth"
 
@@ -41,6 +47,22 @@ models_ofm_nsfw() {
     dl_pub "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth" \
         "$MODELS/sams/sam_vit_b_01ec64.pth"
 
-    # CivitAI LoRA
-    dl_civitai "368603" "$MODELS/loras/Detailed_Nipples_XL_v1.0.safetensors"
+    # Impact Pack detection models (explicit — not relying on auto-download)
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8m.pt" \
+        "$MODELS/ultralytics/bbox/face_yolov8m.pt"
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov8s.pt" \
+        "$MODELS/ultralytics/bbox/hand_yolov8s.pt"
+
+    # IPAdapter CLIP vision (for PLUS FACE preset)
+    dl_pub "https://huggingface.co/h94/IP-Adapter/resolve/main/sdxl_models/ip-adapter-plus-face_sdxl_vit-h.safetensors" \
+        "$MODELS/ipadapter/ip-adapter-plus-face_sdxl_vit-h.safetensors"
+    dl_pub "https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors" \
+        "$MODELS/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
+
+    # Custom NSFW detection models (nipple, pussy, lips)
+    # NOTE: These are custom-trained models. If URLs are unavailable,
+    # FaceDetailer nodes for these specific areas will not work.
+    # The base workflow still functions without them.
+    log "Custom detection models (nipple.pt, pussyV2.pt, lips_v1.pt) require manual placement"
+    log "Place them in: models/ultralytics/bbox/"
 }

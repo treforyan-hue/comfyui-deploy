@@ -6,11 +6,13 @@
 models_ofm_i2v_gen3() {
     section "Models: I2V Gen3 (Dasiwa Wan 2.2)"
 
-    # VAE + text encoder
+    # VAE + text encoder + CLIP vision (needed for I2V conditioning)
     dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/vae/wan_2.1_vae.safetensors" \
         "$MODELS/vae/wan_2.1_vae.safetensors"
     dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" \
         "$MODELS/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
+    dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
+        "$MODELS/clip_vision/clip_vision_h.safetensors"
 
     # Dasiwa models (Low + High noise variants)
     dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/DasiwaWAN22I2V14BLightspeed_synthseductionLowV9.safetensors" \
@@ -27,4 +29,8 @@ models_ofm_i2v_gen3() {
         "$MODELS/loras/WAN-2.2-I2V-BreastPlay-HIGH-v2.safetensors"
     dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/wan22_i2v_shake_high_v2.safetensors" \
         "$MODELS/loras/wan22_i2v_shake_high_v2.safetensors"
+    dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/wan22_i2v_shake_low_v2.safetensors" \
+        "$MODELS/loras/wan22_i2v_shake_low_v2.safetensors"
+    dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/slop_twerk_LowNoise_merged3_7_v2.safetensors" \
+        "$MODELS/loras/slop_twerk_LowNoise_merged3_7_v2.safetensors"
 }

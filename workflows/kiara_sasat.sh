@@ -29,6 +29,11 @@ models_kiara_sasat() {
     dl_pub "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_b_01ec64.pth" \
         "$MODELS/sams/sam_vit_b_01ec64.pth"
 
-    # Impact Pack models (face_yolov8m, hand_yolov8s) auto-download on first use
-    log "Impact Pack detection models will auto-download on first use"
+    # Impact Pack detection models — explicit download (not relying on auto-download)
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8m.pt" \
+        "$MODELS/ultralytics/bbox/face_yolov8m.pt"
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/hand_yolov8s.pt" \
+        "$MODELS/ultralytics/bbox/hand_yolov8s.pt"
+    dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/person_yolov8m-seg.pt" \
+        "$MODELS/ultralytics/segm/person_yolov8m-seg.pt"
 }

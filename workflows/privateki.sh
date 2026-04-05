@@ -23,7 +23,7 @@ models_privateki() {
         "$MODELS/clip_vision/clip_vision_h.safetensors"
 
     # Detection
-    dl_pub "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose-l-wholebody.onnx" \
+    dl_pub "https://huggingface.co/JunkyByte/easy_ViTPose/resolve/main/onnx/wholebody/vitpose-l-wholebody.onnx" \
         "$MODELS/detection/vitpose-l-wholebody.onnx"
     dl_hf "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx" \
         "$MODELS/detection/yolov10m.onnx"

@@ -1,13 +1,14 @@
 # ══════════════════════════════════════════════════════════════
-# ComfyUI Ready Image
+# ComfyUI Ready Image v2
 #
 # Contains: ComfyUI + 39 custom nodes + all pip dependencies
+#           PyTorch 2.11 + CUDA 13 + torchaudio
 # Does NOT contain: models (downloaded at runtime per workflow)
 #
-# Usage: docker pull ghcr.io/treforyan-hue/comfyui-ready:latest
+# Base: runpod/pytorch 2.8 + manual torch 2.11 upgrade
 # ══════════════════════════════════════════════════════════════
 
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+FROM runpod/pytorch:2.8.0-py3.11-cuda12.8.1-cudnn-devel-ubuntu22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV COMFY=/workspace/ComfyUI
@@ -18,9 +19,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git curl ffmpeg libgl1 libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
+# ── PyTorch 2.11 + torchaudio + CUDA 13 ──
+RUN pip install --break-system-packages --no-cache-dir \
+    torch==2.11.0 torchaudio torchvision \
+    --index-url https://download.pytorch.org/whl/cu130
+
+# Symlink nvrtc-builtins so CUDA JIT compilation works
+RUN NVRTC_PATH=$(find /usr/local/lib/python3.11 -name "libnvrtc-builtins.so.13*" -not -name "*.alt.*" 2>/dev/null | head -1) \
+    && if [ -n "$NVRTC_PATH" ]; then \
+         ln -sf "$NVRTC_PATH" /usr/lib/x86_64-linux-gnu/libnvrtc-builtins.so.13.0; \
+       fi
+
+# Verify torch + CUDA
+RUN python3 -c "import torch; print('PyTorch:', torch.__version__); assert torch.cuda.is_available(), 'CUDA not available'; import torchaudio; print('torchaudio:', torchaudio.__version__)"
+
 # ── ComfyUI ──
 RUN git clone --depth 1 https://github.com/comfyanonymous/ComfyUI.git $COMFY \
-    && pip install --break-system-packages -q -r $COMFY/requirements.txt
+    && pip install --break-system-packages --no-cache-dir -q -r $COMFY/requirements.txt
 
 # Create model directories (models downloaded at runtime)
 RUN mkdir -p $COMFY/models/{diffusion_models,unet,vae,text_encoders,clip,clip_vision} \
@@ -79,6 +94,9 @@ RUN git clone --depth 1 https://github.com/jamesWalker55/comfyui-various $CNODES
 RUN git clone --depth 1 https://github.com/SKBv0/ComfyUI_SKBundle $CNODES/ComfyUI_SKBundle
 RUN git clone --depth 1 https://github.com/teskor-hub/comfyui-teskors-utils $CNODES/comfyui-teskors-utils
 
+# I2V Gen3 specific
+RUN git clone --depth 1 https://github.com/princepainter/Comfyui-PainterFLF2V $CNODES/Comfyui-PainterFLF2V
+
 # ── Bundled extras ──
 COPY extras/ComfyUI_INSTARAW $CNODES/ComfyUI_INSTARAW
 COPY extras/KiaraPanels $CNODES/KiaraPanels
@@ -87,7 +105,7 @@ RUN mkdir -p $CNODES/ComfyUI_INSTARAW/js
 # ── Install ALL pip requirements ──
 RUN for d in $CNODES/*/; do \
         if [ -f "$d/requirements.txt" ]; then \
-            pip install --break-system-packages -q -r "$d/requirements.txt" 2>/dev/null || true; \
+            pip install --break-system-packages --no-cache-dir -q -r "$d/requirements.txt" 2>/dev/null || true; \
         fi; \
     done
 
@@ -103,11 +121,22 @@ RUN mkdir -p $CNODES/ComfyUI_UltimateSDUpscale/repositories \
 # Frame-Interpolation RIFE dir
 RUN mkdir -p $CNODES/ComfyUI-Frame-Interpolation/ckpts/rife
 
-# Extra pip packages
-RUN pip install --break-system-packages -q \
+# Extra pip packages (force reinstall torch-compatible versions)
+# NOTE: onnxruntime (CPU) is used for pose detection — GPU version has CUDA compat issues
+RUN pip install --break-system-packages --no-cache-dir -q \
     sageattention mediapipe==0.10.14 lpips pyexiftool \
-    segment_anything imageio-ffmpeg insightface onnxruntime-gpu \
+    segment_anything imageio-ffmpeg insightface onnxruntime \
     2>/dev/null || true
+
+# ── Verify all critical imports ──
+RUN cd $COMFY && python3 -c "\
+import torch; \
+print('torch', torch.__version__); \
+assert torch.cuda.is_available(); \
+import torchaudio; \
+print('torchaudio', torchaudio.__version__); \
+print('CUDA', torch.version.cuda); \
+" && echo "=== ALL CHECKS PASSED ==="
 
 # ── Cleanup ──
 RUN pip cache purge 2>/dev/null || true \
@@ -120,5 +149,5 @@ COPY workflows/ /workspace/workflows/
 
 WORKDIR /workspace/ComfyUI
 
-# Default: start ComfyUI (can be overridden by docker_args)
+# Default: start ComfyUI
 CMD ["python", "main.py", "--listen", "0.0.0.0", "--port", "8188"]

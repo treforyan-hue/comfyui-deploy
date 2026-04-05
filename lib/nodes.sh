@@ -56,6 +56,9 @@ install_all_nodes() {
     clone_node "https://github.com/SKBv0/ComfyUI_SKBundle"
     clone_node "https://github.com/teskor-hub/comfyui-teskors-utils"
 
+    # ── I2V Gen3 specific ──
+    clone_node "https://github.com/princepainter/Comfyui-PainterFLF2V"
+
     # ── KiaraPanels (custom generated nodes for kiara_sasat) ──
     if [ -d "$SCRIPT_DIR/extras/KiaraPanels" ] && [ ! -d "$CNODES/KiaraPanels" ]; then
         log "Installing KiaraPanels..."
@@ -94,7 +97,7 @@ install_all_nodes() {
     # Extra pip packages needed by various nodes
     pip install --break-system-packages -q \
         sageattention mediapipe==0.10.14 lpips pyexiftool \
-        segment_anything imageio-ffmpeg insightface onnxruntime-gpu \
+        segment_anything imageio-ffmpeg insightface onnxruntime \
         2>/dev/null || warn "Some pip packages failed (non-critical)"
 
     log "All custom nodes installed"

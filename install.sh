@@ -167,6 +167,12 @@ if [ "$DRY_RUN" = "0" ]; then
     make_link "$MODELS/text_encoders/qwen_3_8b_fp8mixed.safetensors" "$MODELS/clip/qwen_3_8b_fp8mixed.safetensors"
     make_link "$MODELS/text_encoders/qwen_3_8b.safetensors" "$MODELS/clip/qwen_3_8b.safetensors"
 
+    # t5xxl: some workflows put in clip/, some in text_encoders/
+    make_link "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors"
+    make_link "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors"
+    make_link "$MODELS/text_encoders/clip_l.safetensors" "$MODELS/clip/clip_l.safetensors"
+    make_link "$MODELS/clip/clip_l.safetensors" "$MODELS/text_encoders/clip_l.safetensors"
+
     if [ -f "$MODELS/rife/rife49.pth" ]; then
         make_link "$MODELS/rife/rife49.pth" "$CNODES/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
     fi
