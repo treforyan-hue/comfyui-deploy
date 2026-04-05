@@ -42,6 +42,7 @@ RUN git clone --depth 1 https://github.com/ltdrdata/ComfyUI-Impact-Pack $CNODES/
 # Video / Animation
 RUN git clone --depth 1 https://github.com/kijai/ComfyUI-segment-anything-2 $CNODES/ComfyUI-segment-anything-2
 RUN git clone --depth 1 https://github.com/kijai/ComfyUI-WanAnimatePreprocess $CNODES/ComfyUI-WanAnimatePreprocess
+RUN git clone --depth 1 https://github.com/kijai/ComfyUI-SCAIL-Pose $CNODES/ComfyUI-SCAIL-Pose
 RUN git clone --depth 1 https://github.com/Fannovel16/ComfyUI-Frame-Interpolation $CNODES/ComfyUI-Frame-Interpolation
 RUN git clone --depth 1 https://github.com/vrgamegirl19/comfyui-vrgamedevgirl $CNODES/comfyui-vrgamedevgirl
 
