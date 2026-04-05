@@ -3,6 +3,7 @@
 # COMMON FUNCTIONS — sourced by install.sh
 # Supports: --dry-run mode (verifies URLs without downloading)
 # Supports: RunPod + Vast.ai (auto-detects platform)
+# Downloads via aria2c (16 connections) with curl fallback
 # ══════════════════════════════════════════════════════════════
 set -uo pipefail
 # NOTE: no -e (errexit) — we handle errors in each function
@@ -19,6 +20,31 @@ log()  { echo -e "\033[32m[+]\033[0m $*"; }
 warn() { echo -e "\033[33m[!]\033[0m $*"; }
 err()  { echo -e "\033[31m[x]\033[0m $*"; }
 section() { echo -e "\n\033[36m═══ $* ═══\033[0m\n"; }
+
+# ── Install aria2c if missing ──
+_ensure_aria2() {
+    if ! command -v aria2c &>/dev/null; then
+        apt-get update -qq && apt-get install -y -qq aria2 >/dev/null 2>&1 || true
+    fi
+}
+
+# ── Fast download with aria2c (16 connections), curl fallback ──
+_fast_dl() {
+    local url="$1" dest="$2" header="${3:-}"
+    if command -v aria2c &>/dev/null; then
+        local aria_args=(-x16 -s16 -k5M --min-split-size=5M -d "$(dirname "$dest")" -o "$(basename "$dest")" --console-log-level=warn --summary-interval=5)
+        if [ -n "$header" ]; then
+            aria_args+=(--header="$header")
+        fi
+        aria2c "${aria_args[@]}" "$url" 2>&1
+    else
+        if [ -n "$header" ]; then
+            curl -L --progress-bar -H "$header" "$url" -o "$dest" 2>&1
+        else
+            curl -L --progress-bar "$url" -o "$dest" 2>&1
+        fi
+    fi
+}
 
 # ── Dry-run: verify URL returns 200 ──
 _check_url() {
@@ -55,7 +81,7 @@ dl_hf() {
     fi
     mkdir -p "$(dirname "$dest")"
     log "Downloading: $name ..."
-    if curl -L --progress-bar -H "Authorization: Bearer ${HF_TOKEN:-}" "$url" -o "$dest" 2>&1; then
+    if _fast_dl "$url" "$dest" "Authorization: Bearer ${HF_TOKEN:-}"; then
         if [ "$(stat -c%s "$dest" 2>/dev/null || echo 0)" -gt 1000 ]; then
             DL_OK=$((DL_OK + 1))
             return 0
@@ -83,7 +109,7 @@ dl_pub() {
     fi
     mkdir -p "$(dirname "$dest")"
     log "Downloading: $name ..."
-    if curl -L --progress-bar "$url" -o "$dest" 2>&1; then
+    if _fast_dl "$url" "$dest"; then
         if [ "$(stat -c%s "$dest" 2>/dev/null || echo 0)" -gt 1000 ]; then
             DL_OK=$((DL_OK + 1))
             return 0
@@ -124,9 +150,7 @@ dl_civitai() {
         DL_FAIL=$((DL_FAIL + 1))
         return 1
     fi
-    if curl -L --progress-bar \
-        "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor&token=$tok" \
-        -o "$dest" 2>&1; then
+    if _fast_dl "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor&token=$tok" "$dest"; then
         if [ "$(stat -c%s "$dest" 2>/dev/null || echo 0)" -gt 1000 ]; then
             DL_OK=$((DL_OK + 1))
             return 0

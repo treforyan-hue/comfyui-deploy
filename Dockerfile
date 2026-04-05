@@ -16,7 +16,7 @@ ENV CNODES=/workspace/ComfyUI/custom_nodes
 
 # System packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl ffmpeg libgl1 libglib2.0-0 \
+    git curl ffmpeg libgl1 libglib2.0-0 aria2 \
     && rm -rf /var/lib/apt/lists/*
 
 # ── PyTorch 2.11 + torchaudio + CUDA 13 ──
