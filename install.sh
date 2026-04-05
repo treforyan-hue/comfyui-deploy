@@ -16,6 +16,7 @@
 #   CIVITAI_TOKEN — CivitAI API key (optional, for some workflows)
 # ══════════════════════════════════════════════════════════════
 set -uo pipefail
+# NOTE: no -e — errors handled per-function, script continues on failures
 
 START_TIME=$(date +%s)
 

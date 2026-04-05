@@ -4,7 +4,8 @@
 # Supports: --dry-run mode (verifies URLs without downloading)
 # Supports: RunPod + Vast.ai (auto-detects platform)
 # ══════════════════════════════════════════════════════════════
-set -euo pipefail
+set -uo pipefail
+# NOTE: no -e (errexit) — we handle errors in each function
 
 COMFY=/workspace/ComfyUI
 MODELS="$COMFY/models"
@@ -104,8 +105,8 @@ dl_civitai() {
             warn "CIVITAI_TOKEN not set — cannot verify $name"
             DL_FAIL=$((DL_FAIL + 1))
         else
-            _check_url "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor" \
-                "$name" "Authorization: Bearer $tok"
+            _check_url "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor&token=$tok" \
+                "$name"
         fi
         return 0
     fi
@@ -123,8 +124,8 @@ dl_civitai() {
         DL_FAIL=$((DL_FAIL + 1))
         return 1
     fi
-    if curl -L --progress-bar -H "Authorization: Bearer $tok" \
-        "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor" \
+    if curl -L --progress-bar \
+        "https://civitai.com/api/download/models/${model_id}?type=Model&format=SafeTensor&token=$tok" \
         -o "$dest" 2>&1; then
         if [ "$(stat -c%s "$dest" 2>/dev/null || echo 0)" -gt 1000 ]; then
             DL_OK=$((DL_OK + 1))

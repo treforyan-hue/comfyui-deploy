@@ -17,7 +17,7 @@ models_ofm_zit_gen() {
         "$MODELS/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
 
     # Upscaler
-    dl_pub "https://huggingface.co/ai-forever/RealESRGAN/resolve/main/RealESRGAN_x2.pth" \
+    dl_pub "https://huggingface.co/ai-forever/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth" \
         "$MODELS/upscale_models/RealESRGAN_x2.pth"
 
     # SAM + SeedVR2

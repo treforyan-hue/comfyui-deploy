@@ -12,7 +12,7 @@ models_icy_scail_2() {
     # VAE + text encoders
     dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan2_1_VAE_bf16.safetensors" \
         "$MODELS/vae/Wan2_1_VAE_bf16.safetensors"
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/umt5_xxl_fp8_e4m3fn_scaled.safetensors" \
+    dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" \
         "$MODELS/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors"
     dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
         "$MODELS/clip_vision/clip_vision_h.safetensors"

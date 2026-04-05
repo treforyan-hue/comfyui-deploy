@@ -19,7 +19,7 @@ models_ofm_i2v_gen3() {
         "$MODELS/unet/DasiwaWAN22I2V14BLightspeed_synthseductionHighV9.safetensors"
 
     # Upscaler
-    dl_pub "https://huggingface.co/ai-forever/RealESRGAN/resolve/main/RealESRGAN_x2.pth" \
+    dl_pub "https://huggingface.co/ai-forever/Real-ESRGAN/resolve/main/RealESRGAN_x2.pth" \
         "$MODELS/upscale_models/RealESRGAN_x2.pth"
 
     # LoRAs
