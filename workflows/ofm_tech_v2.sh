@@ -31,26 +31,25 @@ models_ofm_tech_v2() {
         "$MODELS/detection/vitpose_h_wholebody_model.onnx"
     dl_pub "https://huggingface.co/Kijai/vitpose_comfy/resolve/main/onnx/vitpose_h_wholebody_data.bin" \
         "$MODELS/detection/vitpose_h_wholebody_data.bin"
-    dl_pub "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx" \
+    dl_hf "https://huggingface.co/Wan-AI/Wan2.2-Animate-14B/resolve/main/process_checkpoint/det/yolov10m.onnx" \
         "$MODELS/detection/yolov10m.onnx"
     dl_hf "https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_base_plus.safetensors" \
         "$MODELS/sam2/sam2.1_hiera_base_plus.safetensors"
 
-    # RIFE
-    dl_pub "https://huggingface.co/Fannovel16/ComfyUI-Frame-Interpolation/resolve/main/rife49.pth" \
+    # RIFE (public mirror — Fannovel16 repo requires auth)
+    dl_pub "https://huggingface.co/VMTamashii/rife49/resolve/main/rife49.pth" \
         "$MODELS/rife/rife49.pth"
-    # RIFE symlink for Frame-Interpolation node
     make_link "$MODELS/rife/rife49.pth" "$CNODES/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
 
-    # LoRAs (5)
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/WanAnimate_relight_lora_fp16.safetensors" \
+    # LoRAs (5) — fixed URLs after Kijai repo restructure
+    dl_hf "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_animate_14B_relight_lora_bf16.safetensors" \
         "$MODELS/loras/wan2.2_animate14B_relight_lora_bf16.safetensors"
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2vT2V14B_cfg_step_distillv2_lora_rank256_bf16.safetensors" \
+    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/lightx2v_T2V_14B_cfg_step_distill_v2_lora_rank256_bf16.safetensors" \
         "$MODELS/loras/lightx2vT2V14B_cfg_step_distillv2_lora_rank256_bf16.safetensors"
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Lightx2v/wan2.2_iv_lightx2v_4steps_lora_v1_low_noise.safetensors" \
+    dl_hf "https://huggingface.co/Comfy-Org/Wan_2.2_ComfyUI_Repackaged/resolve/main/split_files/loras/wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors" \
         "$MODELS/loras/wan2.2_iv_lightx2v_4steps_lora_v1_low_noise.safetensors"
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Pusa/Wan2.1PusaLoRA14B_rank512_bf16.safetensors" \
+    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Pusa/Wan21_PusaV1_LoRA_14B_rank512_bf16.safetensors" \
         "$MODELS/loras/Wan2.1PusaLoRA14B_rank512_bf16.safetensors"
-    dl_hf "https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/Wan22_FunReward/Wan2.2-Fun-A14B-Inp-low-noise-MPS.safetensors" \
+    dl_hf "https://huggingface.co/alibaba-pai/Wan2.2-Fun-Reward-LoRAs/resolve/main/Wan2.2-Fun-A14B-InP-low-noise-MPS.safetensors" \
         "$MODELS/loras/Wan2.2-Fun-A14B-Inp-low-noise-MPS.safetensors"
 }

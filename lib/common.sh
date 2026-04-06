@@ -29,15 +29,24 @@ _ensure_aria2() {
 }
 
 # ── Fast download with aria2c (16 connections), curl fallback ──
+# NOTE: aria2c fails on HF xet storage backend — auto-fallback to curl
 _fast_dl() {
     local url="$1" dest="$2" header="${3:-}"
+    local ok=0
+
+    # Try aria2c first (fast, 16 connections)
     if command -v aria2c &>/dev/null; then
-        local aria_args=(-x16 -s16 -k5M --min-split-size=5M -d "$(dirname "$dest")" -o "$(basename "$dest")" --console-log-level=warn --summary-interval=5)
+        local aria_args=(-x16 -s16 -k5M --min-split-size=5M -d "$(dirname "$dest")" -o "$(basename "$dest")" --console-log-level=warn --summary-interval=5 --allow-overwrite=true)
         if [ -n "$header" ]; then
             aria_args+=(--header="$header")
         fi
-        aria2c "${aria_args[@]}" "$url" 2>&1
-    else
+        if aria2c "${aria_args[@]}" "$url" 2>&1; then
+            ok=1
+        fi
+    fi
+
+    # Fallback to curl if aria2c failed or unavailable
+    if [ "$ok" = "0" ]; then
         if [ -n "$header" ]; then
             curl -L --progress-bar -H "$header" "$url" -o "$dest" 2>&1
         else
