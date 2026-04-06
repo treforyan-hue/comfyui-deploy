@@ -202,13 +202,16 @@ clone_node() {
     fi
 }
 
-# ── Create symlink (safe) ──
+# ── Create symlink (safe, no circular) ──
 make_link() {
     local target="$1" link="$2"
     [ "$DRY_RUN" = "1" ] && return 0
-    if [ ! -L "$link" ] && [ ! -f "$link" ]; then
-        ln -sf "$target" "$link"
-        log "Symlink: $(basename "$link") -> $(basename "$target")"
+    # Only create symlink if target is a real file (not another symlink to us)
+    if [ -f "$target" ] && [ ! -L "$target" -o -e "$target" ]; then
+        if [ ! -f "$link" ] || [ -L "$link" ]; then
+            ln -sf "$target" "$link"
+            log "Symlink: $(basename "$link") -> $(basename "$target")"
+        fi
     fi
 }
 

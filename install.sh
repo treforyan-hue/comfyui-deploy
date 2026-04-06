@@ -169,11 +169,18 @@ if [ "$DRY_RUN" = "0" ]; then
     make_link "$MODELS/text_encoders/qwen_3_8b_fp8mixed.safetensors" "$MODELS/clip/qwen_3_8b_fp8mixed.safetensors"
     make_link "$MODELS/text_encoders/qwen_3_8b.safetensors" "$MODELS/clip/qwen_3_8b.safetensors"
 
-    # t5xxl: some workflows put in clip/, some in text_encoders/
-    make_link "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors"
-    make_link "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors"
-    make_link "$MODELS/text_encoders/clip_l.safetensors" "$MODELS/clip/clip_l.safetensors"
-    make_link "$MODELS/clip/clip_l.safetensors" "$MODELS/text_encoders/clip_l.safetensors"
+    # t5xxl + clip_l: one-directional only (avoid circular symlinks)
+    # Real file location depends on which workflow downloaded it
+    if [ -f "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors" ] && [ ! -L "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors" ]; then
+        make_link "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors"
+    elif [ -f "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors" ] && [ ! -L "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors" ]; then
+        make_link "$MODELS/clip/t5xxl_fp8_e4m3fn.safetensors" "$MODELS/text_encoders/t5xxl_fp8_e4m3fn.safetensors"
+    fi
+    if [ -f "$MODELS/text_encoders/clip_l.safetensors" ] && [ ! -L "$MODELS/text_encoders/clip_l.safetensors" ]; then
+        make_link "$MODELS/text_encoders/clip_l.safetensors" "$MODELS/clip/clip_l.safetensors"
+    elif [ -f "$MODELS/clip/clip_l.safetensors" ] && [ ! -L "$MODELS/clip/clip_l.safetensors" ]; then
+        make_link "$MODELS/clip/clip_l.safetensors" "$MODELS/text_encoders/clip_l.safetensors"
+    fi
 
     if [ -f "$MODELS/rife/rife49.pth" ]; then
         make_link "$MODELS/rife/rife49.pth" "$CNODES/ComfyUI-Frame-Interpolation/ckpts/rife/rife49.pth"
