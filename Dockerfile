@@ -146,5 +146,5 @@ COPY workflows/ /workspace/workflows/
 
 WORKDIR /workspace/ComfyUI
 
-# Default: start ComfyUI with legacy frontend (rgthree compat)
-CMD ["python", "main.py", "--listen", "0.0.0.0", "--port", "8188", "--front-end-version", "Comfy-Org/ComfyUI_legacy_frontend@latest"]
+# Default: start ComfyUI with pinned frontend (pre-Node 2.0, rgthree compat)
+CMD ["python", "main.py", "--listen", "0.0.0.0", "--port", "8188", "--front-end-version", "Comfy-Org/ComfyUI_frontend@1.42.6"]
