@@ -29,10 +29,13 @@ _ensure_aria2() {
 }
 
 # ── Fast download with aria2c (16 connections), curl fallback ──
-# NOTE: aria2c fails on HF xet storage backend — auto-fallback to curl
+# aria2c returns exit 0 even on errors and may download HTML error pages.
+# Always verify file size > 100KB after download. Fallback to curl on failure.
 _fast_dl() {
     local url="$1" dest="$2" header="${3:-}"
-    local ok=0
+
+    # Remove broken symlinks before download
+    [ -L "$dest" ] && [ ! -e "$dest" ] && rm -f "$dest"
 
     # Try aria2c first (fast, 16 connections)
     if command -v aria2c &>/dev/null; then
@@ -40,18 +43,21 @@ _fast_dl() {
         if [ -n "$header" ]; then
             aria_args+=(--header="$header")
         fi
-        if aria2c "${aria_args[@]}" "$url" 2>&1; then
-            ok=1
+        aria2c "${aria_args[@]}" "$url" 2>&1
+        # Verify: aria2c returns 0 even on error, check file size
+        if [ -f "$dest" ] && [ "$(stat -c%s "$dest" 2>/dev/null || echo 0)" -gt 100000 ]; then
+            return 0
         fi
+        # aria2c failed or downloaded junk — remove and try curl
+        rm -f "$dest" 2>/dev/null
+        warn "aria2c failed, falling back to curl..."
     fi
 
-    # Fallback to curl if aria2c failed or unavailable
-    if [ "$ok" = "0" ]; then
-        if [ -n "$header" ]; then
-            curl -L --progress-bar -H "$header" "$url" -o "$dest" 2>&1
-        else
-            curl -L --progress-bar "$url" -o "$dest" 2>&1
-        fi
+    # Fallback to curl
+    if [ -n "$header" ]; then
+        curl -L --progress-bar -H "$header" "$url" -o "$dest" 2>&1
+    else
+        curl -L --progress-bar "$url" -o "$dest" 2>&1
     fi
 }
 
