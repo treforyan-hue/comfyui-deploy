@@ -35,7 +35,17 @@ models_icy_scail_2() {
     # Symlink for JSON compatibility (some workflows reference as model.onnx)
     make_link "$MODELS/detection/yolov10m.onnx" "$MODELS/detection/model.onnx"
 
+    # Symlinks for JSON compatibility
+    make_link "$MODELS/vae/Wan2_1_VAE_bf16.safetensors" "$MODELS/vae/wan_2.1_vae.safetensors"
+    make_link "$MODELS/text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors" "$MODELS/text_encoders/umt5-xxl-enc-fp8_e4m3fn.safetensors"
+
     # LightX2V LoRA
     dl_hf "https://huggingface.co/MonsterMMORPG/Wan_GGUF/resolve/main/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64_fixed.safetensors" \
         "$MODELS/loras/Wan21_I2V_14B_lightx2v_cfg_step_distill_lora_rank64_fixed.safetensors"
+
+    # DWPose models (used by DWPreprocessor node)
+    dl_pub "https://huggingface.co/yzd-v/DWPose/resolve/main/yolox_l.torchscript.pt" \
+        "$COMFY/custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v--DWPose/yolox_l.torchscript.pt"
+    dl_pub "https://huggingface.co/yzd-v/DWPose/resolve/main/dw-ll_ucoco_384_bs5.torchscript.pt" \
+        "$COMFY/custom_nodes/comfyui_controlnet_aux/ckpts/yzd-v--DWPose/dw-ll_ucoco_384_bs5.torchscript.pt"
 }

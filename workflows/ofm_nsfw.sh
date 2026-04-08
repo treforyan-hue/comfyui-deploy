@@ -59,10 +59,11 @@ models_ofm_nsfw() {
     dl_pub "https://huggingface.co/h94/IP-Adapter/resolve/main/models/image_encoder/model.safetensors" \
         "$MODELS/clip_vision/CLIP-ViT-H-14-laion2B-s32B-b79K.safetensors"
 
-    # Custom NSFW detection models (nipple, pussy, lips)
-    # NOTE: These are custom-trained models. If URLs are unavailable,
-    # FaceDetailer nodes for these specific areas will not work.
-    # The base workflow still functions without them.
-    log "Custom detection models (nipple.pt, pussyV2.pt, lips_v1.pt) require manual placement"
-    log "Place them in: models/ultralytics/bbox/"
+    # NSFW detection models (nipple, pussy, lips)
+    dl_pub "https://huggingface.co/Kentus/Adetailer/resolve/main/nipple.pt" \
+        "$MODELS/ultralytics/bbox/nipple.pt"
+    dl_pub "https://huggingface.co/art0123/Models_collection/resolve/main/bbox/pussyV2.pt" \
+        "$MODELS/ultralytics/bbox/pussyV2.pt"
+    dl_pub "https://huggingface.co/Kentus/Adetailer/resolve/main/lips_v1.pt" \
+        "$MODELS/ultralytics/bbox/lips_v1.pt"
 }

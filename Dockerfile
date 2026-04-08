@@ -102,6 +102,13 @@ RUN git clone https://github.com/teskor-hub/comfyui-teskors-utils $CNODES/comfyu
 # I2V Gen3
 RUN git clone https://github.com/princepainter/Comfyui-PainterFLF2V $CNODES/Comfyui-PainterFLF2V && cd $CNODES/Comfyui-PainterFLF2V && git checkout c81a68f
 
+# I2V Gen3 upscaler (UpscaleWithModelAdvanced)
+RUN git clone https://github.com/Artificial-Sweetener/comfyui-WhiteRabbit $CNODES/comfyui-WhiteRabbit && cd $CNODES/comfyui-WhiteRabbit && git checkout 1781562
+# Skin Gen3 Float literal
+RUN git clone https://github.com/YaserJaradeh/comfyui-yaser-nodes $CNODES/comfyui-yaser-nodes && cd $CNODES/comfyui-yaser-nodes && git checkout 6822585
+# Kiara Sasat ImageComparer
+RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_tools $CNODES/ComfyUI-IF_AI_tools && cd $CNODES/ComfyUI-IF_AI_tools && git checkout 93130d8
+
 # ── Bundled extras ──
 COPY extras/ComfyUI_INSTARAW $CNODES/ComfyUI_INSTARAW
 COPY extras/KiaraPanels $CNODES/KiaraPanels

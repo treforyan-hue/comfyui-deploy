@@ -73,12 +73,13 @@ if [ -z "$WORKFLOW_IDS" ]; then
     echo "  kiara_sasat    — SDXL reference gen (16GB)"
     echo "  ofm_dataset_gen — Florence2 captioning (8GB)"
     echo "  ofm_nsfw       — INSTARAW pipeline (16GB)"
+    echo "  animator_v25   — Animator V2.5 Wan 2.2 + Uni3C (24GB)"
     echo "  ALL            — Everything (~250GB)"
     exit 1
 fi
 
 if [ "$WORKFLOW_IDS" = "ALL" ]; then
-    WORKFLOW_IDS="privateki,ofm_tech_v2,icy_scail_2,ofm_i2v_gen3,ofm_faceswp,controlnt,ofm_skin_gen3,ofm_dt_gen3,ofm_zit_gen,kiara_sasat,ofm_dataset_gen,ofm_nsfw"
+    WORKFLOW_IDS="privateki,ofm_tech_v2,icy_scail_2,ofm_i2v_gen3,ofm_faceswp,controlnt,ofm_skin_gen3,ofm_dt_gen3,ofm_zit_gen,kiara_sasat,ofm_dataset_gen,ofm_nsfw,animator_v25"
 fi
 
 IFS=',' read -ra WF_ARRAY <<< "$WORKFLOW_IDS"
