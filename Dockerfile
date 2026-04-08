@@ -106,7 +106,13 @@ RUN git clone https://github.com/princepainter/Comfyui-PainterFLF2V $CNODES/Comf
 RUN git clone https://github.com/Artificial-Sweetener/comfyui-WhiteRabbit $CNODES/comfyui-WhiteRabbit && cd $CNODES/comfyui-WhiteRabbit && git checkout 1781562
 # Skin Gen3 Float literal
 RUN git clone https://github.com/YaserJaradeh/comfyui-yaser-nodes $CNODES/comfyui-yaser-nodes && cd $CNODES/comfyui-yaser-nodes && git checkout 6822585
-# Kiara Sasat ImageComparer
+# FeiHou Animator: SAM3 video segmentation
+RUN git clone https://github.com/yolain/ComfyUI-Easy-Sam3 $CNODES/ComfyUI-Easy-Sam3 && cd $CNODES/ComfyUI-Easy-Sam3 && git checkout 88fe578
+# FeiHou Animator: Batch segment queue runner
+RUN git clone https://github.com/FX-FeiHou/Comfyui-Segment-Queue-Runner $CNODES/Comfyui-Segment-Queue-Runner && cd $CNODES/Comfyui-Segment-Queue-Runner && git checkout 49f85c1
+# FeiHou Animator: VRAM cleanup
+RUN git clone https://github.com/LAOGOU-666/Comfyui-Memory_Cleanup $CNODES/Comfyui-Memory_Cleanup && cd $CNODES/Comfyui-Memory_Cleanup && git checkout 58de13a
+# Kiara Sasat: ImageComparer (bypassed but needed for no red nodes)
 RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_tools $CNODES/ComfyUI-IF_AI_tools && cd $CNODES/ComfyUI-IF_AI_tools && git checkout 93130d8
 
 # ── Bundled extras ──
