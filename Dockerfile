@@ -113,7 +113,9 @@ RUN git clone https://github.com/FX-FeiHou/Comfyui-Segment-Queue-Runner $CNODES/
 # FeiHou Animator: VRAM cleanup
 RUN git clone https://github.com/LAOGOU-666/Comfyui-Memory_Cleanup $CNODES/Comfyui-Memory_Cleanup && cd $CNODES/Comfyui-Memory_Cleanup && git checkout 58de13a
 # Kiara Sasat: ImageComparer (bypassed but needed for no red nodes)
-RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_tools $CNODES/ComfyUI-IF_AI_tools && cd $CNODES/ComfyUI-IF_AI_tools && git checkout 93130d8
+# NOTE: requirements.txt removed — it pulls 23 heavy deps (anthropic/groq/mistral etc)
+# that are NOT needed for ImageComparer node. The node itself has no special deps.
+RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_tools $CNODES/ComfyUI-IF_AI_tools && cd $CNODES/ComfyUI-IF_AI_tools && git checkout 93130d8 && rm -f requirements.txt
 
 # ── Bundled extras ──
 COPY extras/ComfyUI_INSTARAW $CNODES/ComfyUI_INSTARAW
