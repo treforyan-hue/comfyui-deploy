@@ -65,6 +65,12 @@ install_all_nodes() {
         cp -r "$SCRIPT_DIR/extras/KiaraPanels" "$CNODES/"
     fi
 
+    # ── OFM-SegmentQueueRunner-RU (translated SQR node for FeiHou) ──
+    if [ -d "$SCRIPT_DIR/extras/OFM-SegmentQueueRunner-RU" ] && [ ! -d "$CNODES/OFM-SegmentQueueRunner-RU" ]; then
+        log "Installing OFM-SegmentQueueRunner-RU..."
+        cp -r "$SCRIPT_DIR/extras/OFM-SegmentQueueRunner-RU" "$CNODES/"
+    fi
+
     # ── INSTARAW (proprietary, bundled in repo) ──
     if [ -d "$SCRIPT_DIR/extras/ComfyUI_INSTARAW" ] && [ ! -d "$CNODES/ComfyUI_INSTARAW" ]; then
         log "Installing INSTARAW..."
