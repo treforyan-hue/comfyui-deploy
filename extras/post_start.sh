@@ -7,33 +7,32 @@
 # SSH from the bot; it runs as part of container startup so the
 # bot doesn't need to babysit install kickoff timing.
 #
-# What it does:
-#   1. Source /etc/rp_environment so env vars set on the pod
-#      (HF_TOKEN, CIVITAI_TOKEN, WORKFLOW_ID) are visible.
-#   2. If WORKFLOW_ID is set, launch install.sh in the background.
-#      install.sh DOWNLOADS MODELS, then starts ComfyUI itself at
-#      the very end (same flow as Vast.ai).
+# Architecture: PARALLEL — ComfyUI binds :8188 immediately AND
+# install.sh starts downloading models in parallel.
 #
-# CRITICAL: we do NOT start ComfyUI here in parallel with install.sh.
-# An earlier version did and caused this bug:
-#   - ComfyUI starts immediately on :8188, responds to /system_stats
-#   - bot probes ComfyUI, sees it ready, marks pod status="ready"
-#   - user clicks add_wf thinking install is done
-#   - meanwhile install.sh + aria2c are still saturating network/CPU
-#   - sshd gets starved, refuses new SSH handshakes (TCP open but
-#     SSH banner never sent → asyncssh.TimeoutError)
-#   - add_wf SSH thundering herd kills the pod entirely
-# By keeping it sequential (install.sh → ComfyUI), bot only sees
-# ready when install.sh truly finishes and writes the DONE markers
-# (Nodes: N loaded / ComfyUI is ready) that the regex catches.
+# Why parallel (not sequential install→ComfyUI):
+#   RunPod's networking layer allocates the pod's publicIp + port 22
+#   mapping based on the container actually listening on declared
+#   ports. Empirically: with sequential post_start.sh, pods get stuck
+#   on specific machines never receiving publicIp (tested 3x on
+#   machine k9tyafceeokz — all failed). With parallel post_start.sh
+#   (ComfyUI binds 8188 on boot), publicIp arrives in 60-180s.
+#
+# The "bot marks ready too early" race (which originally pushed me
+# toward sequential) is now fixed in bot/services/install_monitor.py:
+# the monitor only marks status=ready when install.log shows
+# phase >= 7 (DONE markers). Until then, bot stays on the install
+# progress screen even if ComfyUI probe says ready.
+#
+# install.sh's own ComfyUI start at the end does `pkill python3
+# main.py` first, so there's no port conflict — old PID dies, new
+# one binds.
 #
 # Detached pattern: explicit `< /dev/null > log 2>&1 &` so the
 # parent /start.sh can return and let `sleep infinity` keep the
-# container alive. Without these redirects, /start.sh would block
-# waiting for the bg process's fds.
+# container alive.
 # ══════════════════════════════════════════════════════════════
-set -u  # NOTE: no -e — install.sh handles its own errors and we
-        #       don't want a failed model download to kill the pod
+set -u  # no -e — install.sh handles its own errors
 
 echo "[post_start] === ComfyUI Ready RunPod hook ==="
 date
@@ -44,15 +43,31 @@ if [ -f /etc/rp_environment ]; then
     source /etc/rp_environment
     echo "[post_start] sourced /etc/rp_environment"
 else
-    echo "[post_start] WARN: /etc/rp_environment not found — env vars may be missing"
+    echo "[post_start] WARN: /etc/rp_environment not found"
 fi
 
 mkdir -p /workspace
+cd /workspace/ComfyUI || {
+    echo "[post_start] FATAL: /workspace/ComfyUI missing"
+    exit 1
+}
 
-# 2. Launch install.sh in the background. install.sh handles model
-#    downloads AND starts ComfyUI at the very end (same as Vast onstart).
-#    The script is baked into the image at /workspace/install.sh by
-#    the parent jkhlk/comfyui-ready build.
+# 2. Start ComfyUI on :8188 IMMEDIATELY — RunPod's networking sees
+#    port bound → allocates publicIp + portMappings without delay.
+echo "[post_start] starting ComfyUI on 0.0.0.0:8188"
+nohup python3 main.py \
+    --listen 0.0.0.0 \
+    --port 8188 \
+    --front-end-version Comfy-Org/ComfyUI_frontend@1.42.6 \
+    > /workspace/comfyui.log 2>&1 < /dev/null &
+echo $! > /workspace/comfyui.pid
+echo "[post_start] ComfyUI pid=$(cat /workspace/comfyui.pid)"
+
+# 3. If WORKFLOW_ID is set, kick install.sh in parallel. install.sh
+#    downloads models and pkill+restarts ComfyUI at the end. Bot
+#    tails install.log; bot will only mark pod "ready" when log shows
+#    phase >= 7 (DONE). So the parallel ComfyUI start won't cause
+#    the earlier "ready too early → user clicks add_wf" race.
 if [ -n "${WORKFLOW_ID:-}" ]; then
     if [ -f /workspace/install.sh ]; then
         echo "[post_start] launching install.sh for WORKFLOW_ID=$WORKFLOW_ID"
@@ -61,12 +76,10 @@ if [ -n "${WORKFLOW_ID:-}" ]; then
         echo $! > /workspace/install.pid
         echo "[post_start] install.sh pid=$(cat /workspace/install.pid)"
     else
-        echo "[post_start] WARN: /workspace/install.sh missing — cannot install models"
+        echo "[post_start] WARN: /workspace/install.sh missing"
     fi
 else
-    # No WORKFLOW_ID = manual pod, no auto-install. The user can SSH in
-    # and start ComfyUI themselves, or set WORKFLOW_ID and reboot.
-    echo "[post_start] WORKFLOW_ID not set — skipping install + ComfyUI start"
+    echo "[post_start] WORKFLOW_ID not set — ComfyUI only, no model download"
 fi
 
 echo "[post_start] === hook done ==="
