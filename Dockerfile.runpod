@@ -1,32 +1,36 @@
 # ══════════════════════════════════════════════════════════════
 # ComfyUI Ready Image — RunPod variant
 #
-# Thin overlay over jkhlk/comfyui-ready:latest that:
-#   1. Restores runpod-pytorch's /start.sh as the container CMD,
-#      so RunPod's PUBLIC_KEY → sshd setup runs automatically.
-#   2. Adds /post_start.sh which /start.sh executes AFTER sshd is
-#      up. post_start.sh starts ComfyUI on :8188 and (if WORKFLOW_ID
-#      env is set) launches install.sh in the background to download
-#      models — exactly the same script Vast.ai uses.
+# Thin overlay over jkhlk/comfyui-ready:latest. Adds our own
+# /start.sh + /post_start.sh so sshd reliably starts and ComfyUI
+# launches in parallel with install.sh model downloads.
+#
+# Why we ship our own /start.sh:
+#   The base runpod/pytorch image's /start.sh has two landmines:
+#     1. `set -e` on line 2 — any failing command kills the script.
+#     2. Inside setup_ssh() it runs `ssh-keygen -t dsa`. OpenSSH 9.8+
+#        removed DSA support → that command exits non-zero → set -e
+#        kills /start.sh BEFORE `service ssh start` runs → sshd is
+#        never started → container reports RUNNING but port 22 is
+#        unreachable (observed symptom: publicIp assigned but TCP
+#        ConnectionRefused on the mapped port).
+#   Our replacement /start.sh does the same logical flow (PUBLIC_KEY
+#   → sshd → env export → /post_start.sh → sleep infinity) but with
+#   `set +e` and WITHOUT the DSA keygen — modern key types only.
 #
 # This image is RunPod-only. The :latest tag (used by Vast.ai) is
-# unchanged — Vast still gets ComfyUI baked in but with its own
-# CMD ["python","main.py",...] override which Vast replaces via
-# onstart_cmd anyway. Two tags, no shared mutable state.
+# unchanged — Vast has its own onstart_cmd path and never uses
+# /start.sh.
 #
 # Build via .github/workflows/build-image-runpod.yml — pushes
 # `jkhlk/comfyui-ready:runpod`.
 # ══════════════════════════════════════════════════════════════
 FROM jkhlk/comfyui-ready:latest
 
-# RunPod's stock /start.sh is inherited from runpod/pytorch:* base,
-# which jkhlk/comfyui-ready already builds on. The base /start.sh
-# handles: nginx start → /pre_start.sh hook → PUBLIC_KEY → sshd →
-# JUPYTER_PASSWORD → export_env_vars → /post_start.sh hook → sleep
-# infinity. We only need to provide the post_start hook.
+# Custom start.sh + post_start hook
+COPY extras/start.sh /start.sh
 COPY extras/post_start.sh /post_start.sh
-RUN chmod +x /post_start.sh
+RUN chmod +x /start.sh /post_start.sh
 
-# Override the upstream CMD ["python","main.py",...] back to the
-# runpod base /start.sh so the SSH/hook plumbing actually runs.
+# Override the upstream CMD ["python","main.py",...] with our start.sh
 CMD ["/start.sh"]
