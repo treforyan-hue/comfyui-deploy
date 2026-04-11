@@ -10,16 +10,27 @@
 # What it does:
 #   1. Source /etc/rp_environment so env vars set on the pod
 #      (HF_TOKEN, CIVITAI_TOKEN, WORKFLOW_ID) are visible.
-#   2. Launch ComfyUI server in the background on :8188.
-#   3. If WORKFLOW_ID is set, launch install.sh in the background
-#      to download models for that workflow. The install.sh script
-#      is baked into /workspace/install.sh by jkhlk/comfyui-ready
-#      (it's the same script Vast.ai uses via onstart_cmd).
+#   2. If WORKFLOW_ID is set, launch install.sh in the background.
+#      install.sh DOWNLOADS MODELS, then starts ComfyUI itself at
+#      the very end (same flow as Vast.ai).
+#
+# CRITICAL: we do NOT start ComfyUI here in parallel with install.sh.
+# An earlier version did and caused this bug:
+#   - ComfyUI starts immediately on :8188, responds to /system_stats
+#   - bot probes ComfyUI, sees it ready, marks pod status="ready"
+#   - user clicks add_wf thinking install is done
+#   - meanwhile install.sh + aria2c are still saturating network/CPU
+#   - sshd gets starved, refuses new SSH handshakes (TCP open but
+#     SSH banner never sent → asyncssh.TimeoutError)
+#   - add_wf SSH thundering herd kills the pod entirely
+# By keeping it sequential (install.sh → ComfyUI), bot only sees
+# ready when install.sh truly finishes and writes the DONE markers
+# (Nodes: N loaded / ComfyUI is ready) that the regex catches.
 #
 # Detached pattern: explicit `< /dev/null > log 2>&1 &` so the
 # parent /start.sh can return and let `sleep infinity` keep the
 # container alive. Without these redirects, /start.sh would block
-# waiting for the bg processes' fds.
+# waiting for the bg process's fds.
 # ══════════════════════════════════════════════════════════════
 set -u  # NOTE: no -e — install.sh handles its own errors and we
         #       don't want a failed model download to kill the pod
@@ -36,26 +47,12 @@ else
     echo "[post_start] WARN: /etc/rp_environment not found — env vars may be missing"
 fi
 
-cd /workspace/ComfyUI || {
-    echo "[post_start] FATAL: /workspace/ComfyUI missing — image is broken"
-    exit 1
-}
-
-# 2. Launch ComfyUI server in background
 mkdir -p /workspace
-echo "[post_start] starting ComfyUI on 0.0.0.0:8188"
-nohup python3 main.py \
-    --listen 0.0.0.0 \
-    --port 8188 \
-    --front-end-version Comfy-Org/ComfyUI_frontend@1.42.6 \
-    > /workspace/comfyui.log 2>&1 < /dev/null &
-echo $! > /workspace/comfyui.pid
-echo "[post_start] ComfyUI pid=$(cat /workspace/comfyui.pid)"
 
-# 3. If WORKFLOW_ID is set, kick install.sh in the background.
-#    install.sh is idempotent — it skips files that already exist,
-#    so re-runs are cheap. The script is baked into the image at
-#    /workspace/install.sh by the parent jkhlk/comfyui-ready build.
+# 2. Launch install.sh in the background. install.sh handles model
+#    downloads AND starts ComfyUI at the very end (same as Vast onstart).
+#    The script is baked into the image at /workspace/install.sh by
+#    the parent jkhlk/comfyui-ready build.
 if [ -n "${WORKFLOW_ID:-}" ]; then
     if [ -f /workspace/install.sh ]; then
         echo "[post_start] launching install.sh for WORKFLOW_ID=$WORKFLOW_ID"
@@ -67,7 +64,9 @@ if [ -n "${WORKFLOW_ID:-}" ]; then
         echo "[post_start] WARN: /workspace/install.sh missing — cannot install models"
     fi
 else
-    echo "[post_start] WORKFLOW_ID not set — skipping model download"
+    # No WORKFLOW_ID = manual pod, no auto-install. The user can SSH in
+    # and start ComfyUI themselves, or set WORKFLOW_ID and reboot.
+    echo "[post_start] WORKFLOW_ID not set — skipping install + ComfyUI start"
 fi
 
 echo "[post_start] === hook done ==="
