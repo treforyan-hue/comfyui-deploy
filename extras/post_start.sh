@@ -47,6 +47,32 @@ else
 fi
 
 mkdir -p /workspace
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Bootstrap /workspace from /opt/comfy-seed on first boot.
+#
+# Why: RunPod mounts /workspace as a MooseFS network volume. On the FIRST boot
+# of a brand-new pod that mount is empty and shadows whatever the base image
+# baked at /workspace/*. We need to restore the bake from an un-shadowed path.
+#
+# The seed was put at /opt/comfy-seed during image build (Dockerfile.runpod).
+# On subsequent boots /workspace is persistent (the volume survives stop/start)
+# so main.py will already exist and this block is a no-op.
+#
+# rsync is in the base image (installed by Dockerfile apt-get). If for any
+# reason it's missing we fall back to cp -a.
+# ─────────────────────────────────────────────────────────────────────────────
+if [ ! -f /workspace/ComfyUI/main.py ] && [ -d /opt/comfy-seed ]; then
+    echo "[post_start] /workspace empty → seeding from /opt/comfy-seed (first boot)"
+    t0=$(date +%s)
+    if command -v rsync >/dev/null 2>&1; then
+        rsync -a /opt/comfy-seed/ /workspace/
+    else
+        cp -a /opt/comfy-seed/. /workspace/
+    fi
+    echo "[post_start] seed done in $(( $(date +%s) - t0 ))s, size: $(du -sh /workspace 2>/dev/null | awk '{print $1}')"
+fi
+
 cd /workspace/ComfyUI || {
     echo "[post_start] FATAL: /workspace/ComfyUI missing"
     exit 1

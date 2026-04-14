@@ -27,6 +27,26 @@
 # ══════════════════════════════════════════════════════════════
 FROM jkhlk/comfyui-ready:latest
 
+# ─────────────────────────────────────────────────────────────────────────────
+# Seed /opt/comfy-seed so post_start.sh can bootstrap /workspace on first boot.
+#
+# RunPod mounts /workspace as a MooseFS network volume. On the FIRST boot of
+# a brand-new pod that mount is empty and completely shadows whatever was
+# baked at /workspace/* by the base image. Without this seed, /workspace is
+# an empty FUSE dir at boot, ComfyUI can't find main.py, install.sh is gone,
+# post_start prints "WARN: install.sh missing" and the pod does nothing.
+#
+# Fix: copy the baked /workspace tree into /opt/comfy-seed (a path that is
+# NOT shadowed by any volume mount) at build time. post_start.sh rsyncs the
+# seed into /workspace on boot when main.py is missing. After the first boot
+# the seed lives on the persistent volume → second+ boots skip the rsync.
+#
+# Vast.ai (:latest tag) does NOT use this layer and is untouched.
+# ─────────────────────────────────────────────────────────────────────────────
+RUN mkdir -p /opt/comfy-seed \
+    && cp -a /workspace/. /opt/comfy-seed/ \
+    && chmod -R a+rX /opt/comfy-seed
+
 # Custom start.sh + post_start hook
 COPY extras/start.sh /start.sh
 COPY extras/post_start.sh /post_start.sh

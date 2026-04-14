@@ -5,7 +5,15 @@ on:
     branches: [main]
     paths:
       - 'Dockerfile'
-      - 'extras/**'
+      # Узкий список — только то, что базовый Dockerfile реально COPY'ит.
+      # post_start.sh / start.sh принадлежат Dockerfile.runpod и не должны
+      # триггерить ребилд :latest (Vast) — иначе каждый фикс RunPod-hook
+      # впустую пересобирал бы Vast-образ.
+      - 'extras/ComfyUI_INSTARAW/**'
+      - 'extras/KiaraPanels/**'
+      - 'extras/OFM-SegmentQueueRunner-RU/**'
+      - 'install.sh'
+      - 'workflows/**'
       - 'lib/**'
   workflow_dispatch:
 
