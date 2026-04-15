@@ -49,10 +49,11 @@ models_feihou_animator() {
     dl_hf "https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam2.1_hiera_base_plus.safetensors" \
         "$MODELS/sam2/sam2.1_hiera_base_plus.safetensors"
 
-    # SAM3 (for multi-person segmentation, bypassed by default)
-    dl_pub "https://huggingface.co/Kijai/sam2-safetensors/resolve/main/sam3.pt" \
-        "$MODELS/sam3/sam3.pt" 2>/dev/null || \
-    log "SAM3 model (sam3.pt) — download manually if needed"
+    # SAM3 (Meta) — reupload on fwwrsd/feihou-assets with LICENSE alongside (SAM License §1.b.i)
+    dl_pub "https://huggingface.co/fwwrsd/feihou-assets/resolve/main/sam3/sam3.pt" \
+        "$MODELS/sam3/sam3.pt"
+    dl_pub "https://huggingface.co/fwwrsd/feihou-assets/resolve/main/sam3/LICENSE" \
+        "$MODELS/sam3/LICENSE"
 
     # LoRAs (subfolder structure as FeiHou expects)
     mkdir -p "$MODELS/loras/Wan-Enhance" "$MODELS/loras/Wan-Lighting" "$MODELS/loras/Wan-Action"
@@ -72,4 +73,14 @@ models_feihou_animator() {
     # HPS 2.1 aesthetic LoRA
     dl_hf "https://huggingface.co/alibaba-pai/Wan2.2-Fun-Reward-LoRAs/resolve/main/Wan2.2-Fun-A14B-InP-low-noise-HPS2.1.safetensors" \
         "$MODELS/loras/Wan-Enhance/Wan2.1 - Fun-14B-InP-HPS2.1.safetensors"
+
+    # Bounce / Jiggling LoRAs (Wan-Action subfolder)
+    dl_pub "https://huggingface.co/fwwrsd/feihou-assets/resolve/main/Wan-Action/Wan2.2%20-%20I2V%20-%20Slop-Bounce-Low.safetensors" \
+        "$MODELS/loras/Wan-Action/Wan2.2 - I2V - Slop-Bounce-Low.safetensors"
+    # JSON references "Bounce-Test - Low" — symlink so the workflow resolves it
+    make_link "$MODELS/loras/Wan-Action/Wan2.2 - I2V - Slop-Bounce-Low.safetensors" \
+        "$MODELS/loras/Wan-Action/Wan2.2 - I2V - Bounce-Test - Low.safetensors"
+
+    dl_pub "https://huggingface.co/fwwrsd/feihou-assets/resolve/main/Wan-Action/Wan2.1%20-%20I2V%20-%20Bouncing-Jiggling.safetensors" \
+        "$MODELS/loras/Wan-Action/Wan2.1 - I2V - Bouncing-Jiggling.safetensors"
 }
