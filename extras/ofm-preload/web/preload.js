@@ -43,12 +43,44 @@
         const paths = ids.map(function (id) { return "workflows/" + id + ".json"; });
         const workspaceId = "personal";
 
+        // КРИТИЧНО: ComfyUI frontend кеширует current workflow state в
+        // localStorage (ключи Comfy.Workflow.Draft.*, Comfy.Workflow.Open*,
+        // и т.д.). При F5/повторном открытии эти кеши имеют приоритет над
+        // нашим sessionStorage seed → юзер видит СТАРЫЙ workflow вместо
+        // выбранного в URL. Очищаем всё workflow-related ДО seed, чтобы
+        // каждое открытие URL с ?wf=/?wfs= давало чистый старт.
+        // ClientId сохраняем (нужен для persistence ключей).
+        var _preserve = { "Comfy.ClientId": true };
+        var _toRemove = [];
+        for (var i = 0; i < localStorage.length; i++) {
+            var k = localStorage.key(i);
+            if (!k || _preserve[k]) continue;
+            var lk = k.toLowerCase();
+            if (lk.indexOf("workflow") >= 0 || lk.indexOf("graph") >= 0
+                || lk.indexOf("canvas") >= 0) {
+                _toRemove.push(k);
+            }
+        }
+        for (var j = 0; j < _toRemove.length; j++) {
+            try { localStorage.removeItem(_toRemove[j]); } catch (_) {}
+        }
+        // Также чистим sessionStorage полностью — sessionStorage per-tab,
+        // но в браузере с keep-alive вкладок старые ключи с прошлого деплоя
+        // могут висеть и конфликтовать с новым clientId.
+        try {
+            var _sRemove = [];
+            for (var i2 = 0; i2 < sessionStorage.length; i2++) {
+                var sk = sessionStorage.key(i2);
+                if (sk && sk.indexOf("Comfy.Workflow.") === 0) _sRemove.push(sk);
+            }
+            for (var j2 = 0; j2 < _sRemove.length; j2++) {
+                sessionStorage.removeItem(_sRemove[j2]);
+            }
+        } catch (_) {}
+
         // ClientId: должен совпадать с тем что api.ts использует.
-        // api.ts читает localStorage, создаёт UUID если пусто. Мы делаем так же —
-        // если api.ts успел раньше, читаем его значение (совпадение). Если мы
-        // первые — записываем, api.ts потом прочитает то же.
-        const CID_KEY = "Comfy.ClientId";
-        let clientId = localStorage.getItem(CID_KEY);
+        var CID_KEY = "Comfy.ClientId";
+        var clientId = localStorage.getItem(CID_KEY);
         if (!clientId) {
             clientId = (window.crypto && window.crypto.randomUUID)
                 ? window.crypto.randomUUID()
@@ -73,7 +105,10 @@
             } catch (_) { /* ignore */ }
         }
 
-        console.log("[ofm-preload] seeded sessionStorage:", paths, "active:", active);
+        console.log(
+            "[ofm-preload] seeded:", paths, "active:", active,
+            "(cleared", _toRemove.length, "localStorage keys)"
+        );
     } catch (e) {
         console.warn("[ofm-preload] failed (graceful, falls back to empty canvas):", e);
     }
