@@ -31,8 +31,8 @@ models_feihou_animator() {
     dl_hf "https://huggingface.co/Comfy-Org/Wan_2.1_ComfyUI_repackaged/resolve/main/split_files/clip_vision/clip_vision_h.safetensors" \
         "$MODELS/clip_vision/clip_vision_h.safetensors"
 
-    # SDPose model (new — not DWPose!)
-    dl_hf "https://huggingface.co/Comfy-Org/SDPose/resolve/main/sdpose_wholebody_fp16.safetensors" \
+    # SDPose model (comfy-core 0.17+ SDPoseKeypointExtractor, checkpoints/ subdir on HF repo)
+    dl_hf "https://huggingface.co/Comfy-Org/SDPose/resolve/main/checkpoints/sdpose_wholebody_fp16.safetensors" \
         "$MODELS/checkpoints/sdpose_wholebody_fp16.safetensors"
 
     # Detection (ViTPose L + YOLOv10m)
