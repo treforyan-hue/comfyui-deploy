@@ -81,6 +81,12 @@ install_all_nodes() {
         fi
     fi
 
+    # ── ofm-preload (frontend extension: ?wf=<id> URL → auto-load workflow) ──
+    if [ -d "$SCRIPT_DIR/extras/ofm-preload" ] && [ ! -d "$CNODES/ofm-preload" ]; then
+        log "Installing ofm-preload..."
+        cp -r "$SCRIPT_DIR/extras/ofm-preload" "$CNODES/"
+    fi
+
     # ── Post-install fixes ──
 
     # Impact-Pack submodule

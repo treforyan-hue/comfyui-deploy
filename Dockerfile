@@ -120,6 +120,7 @@ RUN git clone https://github.com/if-ai/ComfyUI-IF_AI_tools $CNODES/ComfyUI-IF_AI
 # ── Bundled extras ──
 COPY extras/ComfyUI_INSTARAW $CNODES/ComfyUI_INSTARAW
 COPY extras/KiaraPanels $CNODES/KiaraPanels
+COPY extras/ofm-preload $CNODES/ofm-preload
 RUN mkdir -p $CNODES/ComfyUI_INSTARAW/js
 
 # ── Install ALL pip requirements ──
