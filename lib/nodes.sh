@@ -89,6 +89,20 @@ install_all_nodes() {
 
     # ── Post-install fixes ──
 
+    # WanVideoWrapper: feihou_animator workflow references transition_video kwarg
+    # (existed in author's private fork, never in public main). Patch process() to
+    # accept it as no-op so JSON loads without "unexpected keyword argument" error.
+    # Idempotent: grep-guard — applies only once, skips if already patched.
+    if [ -f "$CNODES/ComfyUI-WanVideoWrapper/nodes.py" ]; then
+        if ! grep -q "transition_video=None):" "$CNODES/ComfyUI-WanVideoWrapper/nodes.py"; then
+            sed -i 's/start_ref_image=None):/start_ref_image=None, transition_video=None):/' \
+                "$CNODES/ComfyUI-WanVideoWrapper/nodes.py" 2>/dev/null || true
+            if grep -q "transition_video=None):" "$CNODES/ComfyUI-WanVideoWrapper/nodes.py"; then
+                log "Patched WanVideoWrapper: transition_video kwarg added (no-op)"
+            fi
+        fi
+    fi
+
     # Impact-Pack submodule
     if [ -d "$CNODES/ComfyUI-Impact-Pack" ] && [ -f "$CNODES/ComfyUI-Impact-Pack/install.py" ]; then
         cd "$CNODES/ComfyUI-Impact-Pack" && python install.py 2>/dev/null || true
