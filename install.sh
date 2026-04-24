@@ -75,6 +75,15 @@ if [ -z "$WORKFLOW_IDS" ]; then
     echo "  ofm_nsfw       — INSTARAW pipeline (16GB)"
     echo "  animator_v25   — Animator V2.5 Wan 2.2 + Uni3C (24GB)"
     echo "  feihou_animator — FeiHou Animator Wan 2.2 + SDPose + SAM3 (24GB)"
+    echo "  tokyo_sage     — Tokyo Sage Wan 2.2 Animate alt (80GB)"
+    echo "  ofmtech_identity_swap — Flux 2 Klein 9b identity swap (24GB)"
+    echo "  instaraw_wan22 — INSTARAW WAN 2.2 T2I + FaceDetailer (48GB)"
+    echo "  instaraw_zimage — INSTARAW Z-Image Pro (24GB)"
+    echo "  instaraw_faceswap — INSTARAW outfit/hair/character swap (12GB)"
+    echo "  instaraw_teleport — INSTARAW background teleport (12GB)"
+    echo "  instaraw_booba — INSTARAW Flux Kontext body enhance (24GB)"
+    echo "  instaraw_big   — INSTARAW NanoBanana/Gemini API (12GB, no models)"
+    echo "  instaraw_bypass_max — INSTARAW anti-detection (12GB, no models)"
     echo "  ALL            — Everything (~250GB)"
     exit 1
 fi

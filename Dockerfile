@@ -123,6 +123,19 @@ COPY extras/KiaraPanels $CNODES/KiaraPanels
 COPY extras/ofm-preload $CNODES/ofm-preload
 RUN mkdir -p $CNODES/ComfyUI_INSTARAW/js
 
+# ── Bundled extras for 9 new WFs (tokyo_sage, ofmtech_identity_swap, instaraw_*) ──
+# Mirrored to treforyan-hue/ofm-nodes-mirror at pinned commits — fully independent
+# from upstream authors. Kept in extras/ instead of git clone so a deleted
+# upstream repo can't break our build.
+COPY extras/a-person-mask-generator   $CNODES/a-person-mask-generator
+COPY extras/cg-use-everywhere         $CNODES/cg-use-everywhere
+COPY extras/ComfyUI_Swwan             $CNODES/ComfyUI_Swwan
+COPY extras/ComfyUI-Batch-Process     $CNODES/ComfyUI-Batch-Process
+COPY extras/ComfyUI-RMBG              $CNODES/ComfyUI-RMBG
+COPY extras/comfyui_segment_anything  $CNODES/comfyui_segment_anything
+COPY extras/LanPaint                  $CNODES/LanPaint
+COPY extras/ofmtechclip               $CNODES/ofmtechclip
+
 # ── Install ALL pip requirements ──
 RUN for d in $CNODES/*/; do \
         if [ -f "$d/requirements.txt" ]; then \
