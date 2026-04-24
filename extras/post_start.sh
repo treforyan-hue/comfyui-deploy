@@ -89,7 +89,37 @@ nohup python3 main.py \
 echo $! > /workspace/comfyui.pid
 echo "[post_start] ComfyUI pid=$(cat /workspace/comfyui.pid)"
 
-# 3. If WORKFLOW_ID is set, kick install.sh in parallel. install.sh
+# 3. Refresh installer + workflows from git BEFORE running install.
+#    Why: image's /workspace/install.sh and /workspace/workflows/*.sh
+#    are baked at image-build time. After bot's workflows.yaml SHA bump,
+#    new model URLs / workflow scripts may be live in the repo BEFORE
+#    the next CI image build completes (CI takes ~12-15 min). Without
+#    this refresh, pods created during that window use stale baked code
+#    even though bot points to the new SHA.
+#
+#    Strategy: lightweight git clone/pull into /workspace/.cd-cache,
+#    then overwrite /workspace/install.sh + workflows/ + lib/. Failures
+#    are non-fatal (graceful fallback to baked image content).
+INSTALLER_CACHE=/workspace/.cd-cache
+INSTALLER_REPO=https://github.com/treforyan-hue/comfyui-deploy
+echo "[post_start] refreshing installer from git ($INSTALLER_REPO main)"
+if [ -d "$INSTALLER_CACHE/.git" ]; then
+    git -C "$INSTALLER_CACHE" fetch --quiet --depth 1 origin main 2>/dev/null \
+      && git -C "$INSTALLER_CACHE" reset --hard --quiet FETCH_HEAD 2>/dev/null \
+      || echo "[post_start] WARN: git fetch failed — using cached version"
+else
+    rm -rf "$INSTALLER_CACHE" 2>/dev/null
+    git clone --quiet --depth 1 "$INSTALLER_REPO" "$INSTALLER_CACHE" 2>/dev/null \
+      || echo "[post_start] WARN: git clone failed — using image-baked installer"
+fi
+if [ -f "$INSTALLER_CACHE/install.sh" ]; then
+    cp -f "$INSTALLER_CACHE/install.sh" /workspace/install.sh 2>/dev/null
+    cp -rf "$INSTALLER_CACHE/workflows/." /workspace/workflows/ 2>/dev/null
+    cp -rf "$INSTALLER_CACHE/lib/." /workspace/lib/ 2>/dev/null
+    echo "[post_start] installer refreshed: HEAD=$(git -C $INSTALLER_CACHE rev-parse --short HEAD 2>/dev/null)"
+fi
+
+# 4. If WORKFLOW_ID is set, kick install.sh in parallel. install.sh
 #    downloads models and pkill+restarts ComfyUI at the end. Bot
 #    tails install.log; bot will only mark pod "ready" when log shows
 #    phase >= 7 (DONE). So the parallel ComfyUI start won't cause
