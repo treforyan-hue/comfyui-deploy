@@ -14,8 +14,9 @@ models_ofm_nsfw() {
     dl_pub "https://huggingface.co/camenduru/FLUX.1-dev-ungated/resolve/main/ae.safetensors" \
         "$MODELS/vae/ae.safetensors"
 
-    # SDXL checkpoint (CivitAI)
-    dl_civitai "2155386" "$MODELS/checkpoints/lustifySDXLNSFW_ggwpV7.safetensors"
+    # SDXL checkpoint — mirrored to HF (was CivitAI 2155386)
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/checkpoints/lustifySDXLNSFW_ggwpV7.safetensors" \
+        "$MODELS/checkpoints/lustifySDXLNSFW_ggwpV7.safetensors"
 
     # ControlNet SDXL Union
     dl_hf "https://huggingface.co/xinsir/controlnet-union-sdxl-1.0/resolve/main/diffusion_pytorch_model_promax.safetensors" \
@@ -25,8 +26,10 @@ models_ofm_nsfw() {
     dl_hf "https://huggingface.co/tianweiy/DMD2/resolve/main/dmd2_sdxl_4step_lora_fp16.safetensors" \
         "$MODELS/loras/dmd2_sdxl_4step_lora_fp16.safetensors"
 
-    # CivitAI LoRA (filename with spaces — matches JSON exactly)
-    dl_civitai "368603" "$MODELS/loras/Detailed Nipples XL v1.0.safetensors"
+    # LoRA — mirrored to HF (was CivitAI 368603). Mirror filename uses underscores;
+    # target keeps spaces to match JSON exactly.
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Detailed_Nipples_XL_v1.0.safetensors" \
+        "$MODELS/loras/Detailed Nipples XL v1.0.safetensors"
 
     # Upscalers (filenames match JSON exactly)
     dl_pub "https://huggingface.co/Kim2091/UltraSharpV2/resolve/main/4x-UltraSharpV2.pth" \
