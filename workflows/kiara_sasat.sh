@@ -13,8 +13,9 @@ models_kiara_sasat() {
     # LoRA — mirrored to HF (was CivitAI 2074888)
     dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Realism_Lora_By_Stable_Yogi_V3_Lite.safetensors" \
         "$MODELS/loras/Realism_Lora_By_Stable_Yogi_V3_Lite.safetensors"
-    # LoRA — kept on CivitAI (not mirrored; requires CIVITAI_TOKEN env)
-    dl_civitai "1089573" "$MODELS/loras/super_skin_detailer.safetensors"
+    # LoRA — mirrored to HF (was CivitAI 1089573, byte-exact sha256 0c3d87c7…)
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/super_skin_detailer.safetensors" \
+        "$MODELS/loras/super_skin_detailer.safetensors"
 
     # Flux Klein 4B (Stage II)
     dl_hf "https://huggingface.co/Comfy-Org/flux2-klein-4B/resolve/main/split_files/diffusion_models/flux-2-klein-4b.safetensors" \
