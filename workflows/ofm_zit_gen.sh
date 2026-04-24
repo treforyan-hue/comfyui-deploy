@@ -32,8 +32,11 @@ models_ofm_zit_gen() {
     dl_pub "https://huggingface.co/Bingsu/adetailer/resolve/main/face_yolov8m.pt" \
         "$MODELS/ultralytics/bbox/face_yolov8m.pt"
 
-    # CivitAI LoRAs
-    dl_civitai "2617751" "$MODELS/loras/Realistic_Snapshot_v5.safetensors"
-    dl_civitai "2529031" "$MODELS/loras/Creating_Realistic_v1.safetensors"
-    dl_civitai "2466153" "$MODELS/loras/Z-TURBO_Photography_35mmPhoto_1536.safetensors"
+    # LoRAs — mirrored to HF (was CivitAI: 2617751, 2529031, 2466153)
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Realistic_Snapshot_v5.safetensors" \
+        "$MODELS/loras/Realistic_Snapshot_v5.safetensors"
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Creating_Realistic_v1.safetensors" \
+        "$MODELS/loras/Creating_Realistic_v1.safetensors"
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Z-TURBO_Photography_35mmPhoto_1536.safetensors" \
+        "$MODELS/loras/Z-TURBO_Photography_35mmPhoto_1536.safetensors"
 }

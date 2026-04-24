@@ -222,15 +222,52 @@ if [ "$DRY_RUN" = "0" ]; then
 
         detect_platform
 
+        # ── Cloudflared anonymous HTTPS tunnel ──
+        # Universal access workaround: direct pod URLs (http://IP:port for Vast,
+        # *.proxy.runpod.net for RunPod) are blocked on iOS Safari, corp WiFi,
+        # some VPNs and ISPs that DNS-block runpod.net. Cloudflared anonymous
+        # tunnel routes through Cloudflare anycast — works ~everywhere.
+        # Anonymous tunnels may close after several hours; auto-restart can be
+        # added as a separate enhancement.
+        section "Cloudflared HTTPS tunnel"
+        if [ ! -x /usr/local/bin/cloudflared ]; then
+            curl -sL -o /usr/local/bin/cloudflared \
+                https://github.com/cloudflare/cloudflared/releases/latest/download/cloudflared-linux-amd64 2>/dev/null
+            chmod +x /usr/local/bin/cloudflared 2>/dev/null
+        fi
+        CF_URL=""
+        if [ -x /usr/local/bin/cloudflared ]; then
+            pkill -f "cloudflared tunnel" 2>/dev/null || true
+            sleep 1
+            nohup /usr/local/bin/cloudflared tunnel --no-autoupdate \
+                --url http://localhost:8188 \
+                > /workspace/cloudflared.log 2>&1 &
+            for i in $(seq 1 20); do
+                CF_URL=$(grep -oE 'https://[a-z0-9-]+\.trycloudflare\.com' \
+                    /workspace/cloudflared.log 2>/dev/null | head -1)
+                [ -n "$CF_URL" ] && break
+                sleep 2
+            done
+            if [ -n "$CF_URL" ]; then
+                echo "$CF_URL" > /workspace/cloudflared_url.txt
+                log "HTTPS URL: $CF_URL"
+            else
+                warn "cloudflared did not produce URL in 40s; check /workspace/cloudflared.log"
+            fi
+        else
+            warn "cloudflared binary missing; HTTPS tunnel skipped"
+        fi
+
         ELAPSED=$(( $(date +%s) - START_TIME ))
         section "DONE"
-        log "Platform:  $PLATFORM"
-        log "GPU:       $GP"
-        log "Nodes:     $NC loaded"
-        log "Time:      $((ELAPSED / 60))m $((ELAPSED % 60))s"
-        log "Downloads: $DL_OK ok, $DL_SKIP skipped, $DL_FAIL failed"
-        log "URL:       $COMFYUI_URL"
-        log "Log:       /workspace/comfyui.log"
+        log "Platform:    $PLATFORM"
+        log "GPU:         $GP"
+        log "Nodes:       $NC loaded"
+        log "Time:        $((ELAPSED / 60))m $((ELAPSED % 60))s"
+        log "Downloads:   $DL_OK ok, $DL_SKIP skipped, $DL_FAIL failed"
+        log "Direct URL:  $COMFYUI_URL"
+        [ -n "$CF_URL" ] && log "HTTPS URL:   $CF_URL"
+        log "Log:         /workspace/comfyui.log"
     else
         err "ComfyUI did not start in 5 min"
         err "Check: tail -50 /workspace/comfyui.log"

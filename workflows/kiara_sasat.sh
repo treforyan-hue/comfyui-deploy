@@ -6,11 +6,14 @@
 models_kiara_sasat() {
     section "Models: Kiara Sasat (SDXL + Flux Klein 4B)"
 
-    # SDXL checkpoint (CivitAI)
-    dl_civitai "2368123" "$MODELS/checkpoints/gonzalomoXLFluxPony_v60PhotoXLDMD.safetensors"
+    # SDXL checkpoint — mirrored to HF (was CivitAI 2368123)
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/checkpoints/gonzalomoXLFluxPony_v60PhotoXLDMD.safetensors" \
+        "$MODELS/checkpoints/gonzalomoXLFluxPony_v60PhotoXLDMD.safetensors"
 
-    # LoRAs (CivitAI)
-    dl_civitai "2074888" "$MODELS/loras/Realism_Lora_By_Stable_Yogi_V3_Lite.safetensors"
+    # LoRA — mirrored to HF (was CivitAI 2074888)
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/Realism_Lora_By_Stable_Yogi_V3_Lite.safetensors" \
+        "$MODELS/loras/Realism_Lora_By_Stable_Yogi_V3_Lite.safetensors"
+    # LoRA — kept on CivitAI (not mirrored; requires CIVITAI_TOKEN env)
     dl_civitai "1089573" "$MODELS/loras/super_skin_detailer.safetensors"
 
     # Flux Klein 4B (Stage II)

@@ -6,10 +6,15 @@
 models_ofm_skin_gen3() {
     section "Models: OFM Skin Gen3"
 
-    # CivitAI checkpoints
-    dl_civitai "1301668" "$MODELS/loras/aidmaRealisticSkin-FLUX-v0.1.safetensors"
-    dl_civitai "1413133" "$MODELS/unet/ultrarealFineTune_v4.safetensors"
-    dl_civitai "2593828" "$MODELS/unet/zEpicrealism_turboV1Fp8.safetensors"
+    # Checkpoints — mirrored to HF (was CivitAI: 1301668, 1413133, 2593828)
+    # Note: 1413133 (ultrarealFineTune_v4) was GGUF on CivitAI but UNETLoader expects safetensors;
+    # mirror has the full 23.8GB safetensors version which fixes the existing GGUF→.safetensors rename bug.
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/loras/aidmaRealisticSkin-FLUX-v0.1.safetensors" \
+        "$MODELS/loras/aidmaRealisticSkin-FLUX-v0.1.safetensors"
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/unet/ultrarealFineTune_v4.safetensors" \
+        "$MODELS/unet/ultrarealFineTune_v4.safetensors"
+    dl_pub "https://huggingface.co/fwwrsd/ofm-models/resolve/main/unet/zEpicrealism_turboV1Fp8.safetensors" \
+        "$MODELS/unet/zEpicrealism_turboV1Fp8.safetensors"
 
     # CLIP + T5
     dl_hf "https://huggingface.co/comfyanonymous/flux_text_encoders/resolve/main/clip_l.safetensors" \
