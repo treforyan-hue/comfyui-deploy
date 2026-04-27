@@ -20,6 +20,14 @@ set -uo pipefail
 
 START_TIME=$(date +%s)
 
+# ── Remove broken JS extensions from Swwan vendor ──
+# Swwan/web/js/*.js имеет битые импорты `../../rgthree/common/...`
+# которые резолвятся в 404 и вызывают "Loading Error" в ComfyUI frontend.
+# Все 22 наших workflow используют ноды Swwan через NODE_CLASS_MAPPINGS (Python),
+# виджеты для них берутся из настоящих ComfyUI-KJNodes/LayerStyle/rgthree-comfy.
+# Удаляем `web/` чтобы убрать конфликт без потери функционала.
+rm -rf /workspace/ComfyUI/custom_nodes/ComfyUI_Swwan/web 2>/dev/null || true
+
 # Parse --dry-run flag
 export DRY_RUN=0
 ARGS=()
