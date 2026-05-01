@@ -15,9 +15,9 @@ models_ofm_i2v_gen3() {
         "$MODELS/clip_vision/clip_vision_h.safetensors"
 
     # Dasiwa models (Low + High noise variants)
-    dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/DasiwaWAN22I2V14BLightspeed_synthseductionLowV9.safetensors" \
+    dl_pub "https://huggingface.co/fwwrsd/dasiwa-i2v-mirror/resolve/main/DasiwaWAN22I2V14BLightspeed_synthseductionLowV9.safetensors" \
         "$MODELS/unet/DasiwaWAN22I2V14BLightspeed_synthseductionLowV9.safetensors"
-    dl_hf "https://huggingface.co/m33nt0r/DASIWA/resolve/main/DasiwaWAN22I2V14BLightspeed_synthseductionHighV9.safetensors" \
+    dl_pub "https://huggingface.co/fwwrsd/dasiwa-i2v-mirror/resolve/main/DasiwaWAN22I2V14BLightspeed_synthseductionHighV9.safetensors" \
         "$MODELS/unet/DasiwaWAN22I2V14BLightspeed_synthseductionHighV9.safetensors"
 
     # Upscaler
@@ -26,9 +26,9 @@ models_ofm_i2v_gen3() {
 
     # LoRAs
     # LoRAs (m33nt0r/DASIWA moved to thatboymentor/DASIWA + adbrasi/wanlotest)
-    dl_hf "https://huggingface.co/thatboymentor/DASIWA/resolve/main/WAN-2.2-I2V-BreastPlay-HIGH-v2.safetensors" \
+    dl_pub "https://huggingface.co/fwwrsd/breastplay-i2v-mirror/resolve/main/WAN-2.2-I2V-BreastPlay-HIGH-v2.safetensors" \
         "$MODELS/loras/WAN-2.2-I2V-BreastPlay-HIGH-v2.safetensors"
-    dl_hf "https://huggingface.co/thatboymentor/DASIWA/resolve/main/wan22_i2v_shake_high_v2.safetensors" \
+    dl_pub "https://huggingface.co/fwwrsd/wanshake-mirror/resolve/main/wan22_i2v_shake_high_v2.safetensors" \
         "$MODELS/loras/wan22_i2v_shake_high_v2.safetensors"
     # wan22_i2v_shake_low_v2 — not available publicly, using HIGH variant only
     dl_hf "https://huggingface.co/adbrasi/wanlotest/resolve/main/slop_twerk_LowNoise_merged3_7_v2.safetensors" \
