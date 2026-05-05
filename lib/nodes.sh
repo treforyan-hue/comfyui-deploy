@@ -261,14 +261,14 @@ sys.exit(1)
     if [ -d "$RGTHREE/.git" ]; then
         local CURRENT
         CURRENT=$(git -C "$RGTHREE" rev-parse --short=7 HEAD 2>/dev/null)
-        if [ "$CURRENT" = "683836c" ]; then
-            log "rgthree-comfy: already at 683836c"
+        if [ -z "$CURRENT" ]; then
+            warn "rgthree-comfy: cannot read current HEAD"
             PATCH_OK=$((PATCH_OK+1))
         else
-            log "rgthree-comfy: updating $CURRENT -> 683836c"
-            if (cd "$RGTHREE" && git fetch --quiet --depth 50 origin main 2>/dev/null && \
-                git checkout --quiet 683836c46e89e4a55da57d97c8ddec06a9ed9bca 2>/dev/null); then
-                log "rgthree-comfy: pinned to 683836c"
+            log "rgthree-comfy: updating $CURRENT -> latest main"
+            if (cd "$RGTHREE" && git fetch --quiet origin main 2>/dev/null && \
+                git reset --hard --quiet origin/main 2>/dev/null); then
+                log "rgthree-comfy: updated to latest main ($(git -C \"$RGTHREE\" rev-parse --short HEAD))"
                 PATCH_OK=$((PATCH_OK+1))
             else
                 warn "rgthree-comfy: git checkout failed"

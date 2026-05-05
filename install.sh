@@ -225,7 +225,7 @@ if [ "$DRY_RUN" = "0" ]; then
     sleep 2
 
     cd "$COMFY"
-    nohup python3 main.py --listen 0.0.0.0 --port 8188 --front-end-version Comfy-Org/ComfyUI_frontend@1.42.6 > /workspace/comfyui.log 2>&1 &
+    nohup python3 main.py --listen 0.0.0.0 --port 8188 > /workspace/comfyui.log 2>&1 &
     CPID=$!
 
     log "PID: $CPID — waiting for startup (max 5 min)..."
