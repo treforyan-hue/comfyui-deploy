@@ -157,6 +157,12 @@ fi
 install_all_nodes
 
 # ══════════════════════════════════════
+# STEP 2.5: Runtime patches (idempotent)
+# ══════════════════════════════════════
+apply_runtime_patches
+
+
+# ══════════════════════════════════════
 # STEP 3: Models (per workflow)
 # ══════════════════════════════════════
 section "Model downloads"
